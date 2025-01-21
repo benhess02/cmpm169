@@ -55,6 +55,16 @@ function applyGravity(i, j, inv_x, inv_y) {
   }
 }
 
+function mouseClicked() {
+  objects.push({
+    x: mouseX,
+    y: mouseY,
+    vx: 0,
+    vy: 0,
+    size: random() * 5
+  });
+}
+
 function draw() {
   background(25, 25, 25, 25);
   
