@@ -1,79 +1,134 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+// sketch.js - a vector style gravity simulation
+// Author: Ben Hess
+// Date: 1/20/2025
 
-// Here is how you might set up an OOP p5.js project
-// Note that p5.js looks for a file called sketch.js
+let objects = [];
 
-// Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
-
-// Globals
-let myInstance;
-let canvasContainer;
-var centerHorz, centerVert;
-
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
-    }
-
-    myMethod() {
-        // code to run when method is called
-    }
-}
-
-function resizeScreen() {
-  centerHorz = canvasContainer.width() / 2; // Adjusted for drawing logic
-  centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
-  console.log("Resizing...");
-  resizeCanvas(canvasContainer.width(), canvasContainer.height());
-  // redrawCanvas(); // Redraw everything based on new size
-}
-
-// setup() function is called once when the program starts
 function setup() {
-  // place our canvas, making it fit our container
   canvasContainer = $("#canvas-container");
   let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
   canvas.parent("canvas-container");
-  // resize canvas is the page is resized
-
-  // create an instance of the class
-  myInstance = new MyClass("VALUE1", "VALUE2");
-
-  $(window).resize(function() {
-    resizeScreen();
-  });
-  resizeScreen();
+  
+  background(25, 25, 25);
+  stroke(0, 255, 0);
+  noFill();
+  
+  // Create objects
+  for(let i = 0; i < 500; i++) {
+    let a = random() * 360;
+    let d = random() * 400;
+    objects.push({
+      x: random() * width,
+      y: random() * height,
+      vx: random() * 2 - 1,
+      vy: random() * 2 - 1,
+      size: random() * 5
+    });
+  }
 }
 
-// draw() function is called repeatedly, it's the main animation loop
+function applyGravity(i, j, inv_x, inv_y) {
+  let rx = objects[j].x - objects[i].x;
+  let ry = objects[j].y - objects[i].y;
+  if(inv_x) {
+    if(rx > 0) {
+      rx = -width + rx; 
+    } else {
+      rx = width + rx;
+    }
+  }
+  if(inv_y) {
+    if(ry > 0) {
+      ry = -height + ry; 
+    } else {
+      ry = height + ry;
+    }
+  }
+  let r_sq = rx * rx + ry * ry;
+  if(r_sq >= 0) {
+    let f = (objects[i].size * objects[j].size) / r_sq;
+    let r = sqrt(r_sq);
+    let fx = rx / r * f;
+    let fy = ry / r * f;
+    objects[i].vx += fx / objects[i].size;
+    objects[i].vy += fy / objects[i].size;
+  }
+}
+
 function draw() {
-  background(220);    
-  // call a method on the instance
-  myInstance.myMethod();
-
-  // Set up rotation for the rectangle
-  push(); // Save the current drawing context
-  translate(centerHorz, centerVert); // Move the origin to the rectangle's center
-  rotate(frameCount / 100.0); // Rotate by frameCount to animate the rotation
-  fill(234, 31, 81);
-  noStroke();
-  rect(-125, -125, 250, 250); // Draw the rectangle centered on the new origin
-  pop(); // Restore the original drawing context
-
-  // The text is not affected by the translate and rotate
-  fill(255);
-  textStyle(BOLD);
-  textSize(140);
-  text("p5*", centerHorz - 105, centerVert + 40);
-}
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
+  background(25, 25, 25, 25);
+  
+  // Check collisions
+  for(let i = 0; i < objects.length; i++) {
+    for(let j = 0; j < objects.length; j++) {
+      if(i != j) {
+        let rx = objects[j].x - objects[i].x;
+        let ry = objects[j].y - objects[i].y;
+        let r_sq = rx * rx + ry * ry;
+        let ri = pow(objects[i].size, 1 / 3);
+        let rj = pow(objects[j].size, 1 / 3);
+        let min_r = ri + rj;
+        if(r_sq < min_r * min_r) {
+          let new_size = objects[i].size + objects[j].size;
+          let new_x = (objects[i].x * objects[i].size + objects[j].x * objects[j].size) / new_size;
+          let new_y = (objects[i].y * objects[i].size + objects[j].y * objects[j].size) / new_size;
+          let new_vx = (objects[i].vx * objects[i].size + objects[j].vx * objects[j].size) / new_size;
+          let new_vy = (objects[i].vy * objects[i].size + objects[j].vy * objects[j].size) / new_size;
+          objects.splice(i, 1);
+          if(j > i) {
+            j -= 1;
+          }
+          i -= 1;
+          objects.splice(j, 1);
+          if(i > j) {
+            i -= 1;
+          }
+          j -= 1;
+          objects.push({
+            x: new_x,
+            y: new_y,
+            vx: new_vx,
+            vy: new_vy,
+            size: new_size
+          });
+          break;
+        }
+      }
+    }
+  }
+  
+  // Update velocities
+  for(let i = 0; i < objects.length; i++) {
+    for(let j = 0; j < objects.length; j++) {
+      if(i != j) {
+        applyGravity(i, j, false, false);
+        applyGravity(i, j, true, false);
+        applyGravity(i, j, false, true);
+        applyGravity(i, j, true, true);
+      }
+    }
+  }
+  
+  // Move objects
+  for(let i = 0; i < objects.length; i++) {
+    objects[i].x += objects[i].vx;
+    objects[i].y += objects[i].vy;
+    if(objects[i].x >= width) {
+      objects[i].x -= width;
+    }
+    if(objects[i].x < 0) {
+      objects[i].x += width;
+    }
+    if(objects[i].y >= height) {
+      objects[i].y -= height;
+    }
+    if(objects[i].y < 0) {
+      objects[i].y += height;
+    }
+  }
+  
+  // Draw objects
+  for(let i = 0; i < objects.length; i++) {
+    circle(objects[i].x, objects[i].y, pow(objects[i].size, 1 / 3));
+  }
 }

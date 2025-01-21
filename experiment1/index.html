@@ -2,7 +2,7 @@
 <html>
 <head>
 	<!-- This title is used for tabs and bookmarks -->
-	<title>Experiment X - Subject/Topic</title>
+	<title>Experiment 1 - Vector Art, Animation & Interactivity</title>
 
 	<!-- Use UTF character set, a good idea with any webpage -->
 	<meta charset="UTF-8" />
@@ -32,7 +32,7 @@
 	<main id="content">
 		<section>
 
-			<h1>Experiment X - Subject/Topic</h1>
+			<h1>Experiment 1 - Vector Art, Animation & Interactivity</h1>
 
 			<div class="minor-section">
 				<div id="canvas-container">
@@ -45,17 +45,30 @@
 
 			<div class="minor-section">
 				<h2>Description</h2>
-				<p>What are you trying to acomplish with this experiment?</p>
+				<p>A gravity simulation using CRT style vector graphics.</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Technical</h2>
-				<p>Describe in detail what you did technically and how it works?</p>
+				<p>I keep track of a list of the positions, velocities, and sizes of objects in a list.
+					Then, each frame, I apply Newton's equation for gravity to each of the objects in
+					order to change their velocities, then move each of them by a step based on their
+					new velocity. This results in a good approximation of gravity, but without any forces
+					keeping them apart they all just fall towards each other immediately. To fix this, both
+					the objects and the gravitational forces wrap around the edges of the screen, the same
+					way Pac-Man does when you go off one side of the level. This keeps the objects apart in
+					a more natural way and approximates what it would be like if the simulation was infinite.</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>Each person that worked on the code should reflect on the process, the difficulties, and the successes of the experiment.</p>
+				<p>I enjoyed this experiment as I find both physics simulations and vector graphics to
+					be really interesting. I was surprised how easy it was to get the graphics and
+					simulation to a working state, but how hard it was to find ways to keep the simulation
+					from either collapsing in on itself or exploding off the sides of the screen. One
+					interesting problem I faced early on was that, as a result of not having object
+					collision implemented, objects would become unrealistically close together and the
+					forces would throw them off the screen at crazy speeds.</p>
 			</div>
 
 		</section>
