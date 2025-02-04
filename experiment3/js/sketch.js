@@ -11,7 +11,7 @@ let oscillators = []
 let oscillators2 = []
 
 function preload() {
-  img = loadImage("/Houses_of_Parliament.jpg");
+  img = loadImage("/cmpm169/Houses_of_Parliament.jpg");
 }
 
 function setup() {
